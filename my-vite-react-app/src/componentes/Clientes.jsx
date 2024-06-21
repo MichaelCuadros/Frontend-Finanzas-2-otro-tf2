@@ -3,7 +3,7 @@ import { Aside } from "./Aside";
 import "../styles/Clientes.css";
 import { urlAPI } from "./urlAPI";
 
-const Clientes = ({ usuario , setUsuario}) => {
+const Clientes = ({ usuario, setUsuario }) => {
   const [clientes, setClientes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState({
@@ -20,7 +20,9 @@ const Clientes = ({ usuario , setUsuario}) => {
   }, []);
 
   const obtenerClientes = () => {
-    fetch(`${urlAPI.urlAPI}/clientes/clientes-por-usuario-empresa/${usuario.usuario.Empresa_id}`)
+    fetch(
+      `${urlAPI.urlAPI}/clientes/clientes-por-usuario-empresa/${usuario.usuario.Empresa_id}`
+    )
       .then((response) => response.json())
       .then((data) => setClientes(data))
       .catch((error) => console.error("Error al obtener los clientes:", error));
@@ -93,7 +95,7 @@ const Clientes = ({ usuario , setUsuario}) => {
                 <td>{cliente.tasaMoratoria}%</td>
                 <td>${cliente.limiteCredito}</td>
                 <td>
-                  {new Date(cliente.fechaPagoMensual).toLocaleDateString()}
+                  {cliente.fechaPagoMensual[8] + cliente.fechaPagoMensual[9] + " de cada mes"}
                 </td>
                 <td>
                   <button

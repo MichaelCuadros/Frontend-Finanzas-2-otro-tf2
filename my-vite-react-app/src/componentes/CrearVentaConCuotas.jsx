@@ -22,6 +22,7 @@ const CrearVentaConCuotas = ({ usuario, setUsuario }) => {
   const [tiposCredito, setTiposCredito] = useState([]);
   const [tiposInteres, setTiposInteres] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showCuotas, setShowCuotas] = useState(true);
 
   const plazoGraciaRef = useRef(null);
   const cuotasRef = useRef(null);
@@ -36,23 +37,17 @@ const CrearVentaConCuotas = ({ usuario, setUsuario }) => {
     const plazoGraciaInput = plazoGraciaRef.current;
     const cuotasInput = cuotasRef.current;
 
-    if (plazoGraciaInput && cuotasInput) {
-      plazoGraciaInput.disabled = false;
-      cuotasInput.disabled = false;
-    }
+    const selectedTipoCredito = tiposCredito.find(tc => tc._id === formData.TipoCredito_id);
 
-    if (formData.TipoCredito_id && tiposCredito.find(tc => tc._id === formData.TipoCredito_id)?.label === "Siguiente Fecha") {
+    if (selectedTipoCredito?.nombre === "Pago a la siguiente fecha") {
       setFormData(prevState => ({
         ...prevState,
         plazoGracia: 0,
         cuotas: 1,
       }));
-      if (plazoGraciaInput && cuotasInput) {
-        plazoGraciaInput.value = '0';
-        cuotasInput.value = '1';
-        plazoGraciaInput.disabled = true;
-        cuotasInput.disabled = true;
-      }
+      setShowCuotas(false);
+    } else {
+      setShowCuotas(true);
     }
   }, [formData.TipoCredito_id, tiposCredito]);
 
@@ -99,7 +94,7 @@ const CrearVentaConCuotas = ({ usuario, setUsuario }) => {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(`Error al crear la venta: ${errorMessage}`);
@@ -182,17 +177,32 @@ const CrearVentaConCuotas = ({ usuario, setUsuario }) => {
                 ))}
               </select>
             </div>
-            <div className="form-row">
-              <label>Cuotas:</label>
-              <input
-                type="number"
-                name="cuotas"
-                value={formData.cuotas}
-                onChange={handleChange}
-                required
-                ref={cuotasRef}
-              />
-            </div>
+            {showCuotas && (
+              <>
+                <div className="form-row">
+                  <label>Cuotas:</label>
+                  <input
+                    type="number"
+                    name="cuotas"
+                    value={formData.cuotas}
+                    onChange={handleChange}
+                    required
+                    ref={cuotasRef}
+                  />
+                </div>
+                <div className="form-row">
+                  <label>Plazo de Gracia:</label>
+                  <input
+                    type="number"
+                    name="plazoGracia"
+                    value={formData.plazoGracia}
+                    onChange={handleChange}
+                    required
+                    ref={plazoGraciaRef}
+                  />
+                </div>
+              </>
+            )}
             <div className="form-row">
               <label>Tipo Interés:</label>
               <select
@@ -218,17 +228,6 @@ const CrearVentaConCuotas = ({ usuario, setUsuario }) => {
                 value={formData.tasaInteres}
                 onChange={handleChange}
                 required
-              />
-            </div>
-            <div className="form-row">
-              <label>Plazo de Gracia:</label>
-              <input
-                type="number"
-                name="plazoGracia"
-                value={formData.plazoGracia}
-                onChange={handleChange}
-                required
-                ref={plazoGraciaRef}
               />
             </div>
           </div>
